@@ -4,7 +4,7 @@ url = 'https://qastand.valhalla.pw/login'
 
 class TestOpen:
     def test_open_browser(self):
-        browser = Chrome()
-        browser.get(url)
-        print(url.get)
-        browser.quit()
+        with Chrome() as browser:
+            browser.get(url)
+            print(f"{browser.current_url}")
+            browser.quit()
