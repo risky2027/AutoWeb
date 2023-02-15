@@ -1,6 +1,11 @@
-from selenium.webdriver import Chrome
+import os.path
+import time
+
+from selenium.webdriver import Chrome, Keys
 from selenium.webdriver.common.by import By
-from functions import login, check_element_present
+from selenium.webdriver.support.select import Select
+
+from functions import login, element_is_present, wait_until_clickable, wait_until_visible
 
 
 def test_inputs_page():
@@ -9,11 +14,10 @@ def test_inputs_page():
         browser.get(url)
         browser.maximize_window()
         login(browser)
-        input_test = browser.find_element(By.NAME, "test")
-        input_test.send_keys("Сообщение")
-        browser.find_element(By.CLASS_NAME, "button:nth-child(2)").click()
+        wait_until_clickable(browser, (By.NAME, "test")).send_keys("Сообщение")
+        wait_until_clickable(browser, (By.CLASS_NAME, "button:nth-child(2)")).click()
         by, value = By.CLASS_NAME, "is-success"
-        assert check_element_present(browser, by, value), "Не появилось сообщение об успехе"
+        assert element_is_present(browser, (by, value)), "Не появилось сообщение об успехе"
         assert browser.find_element(by, value).text == "Верно", "Сообщение неверное"
 
 
@@ -23,17 +27,13 @@ def test_my_pet_positive():
         browser.get(url)
         browser.maximize_window()
         login(browser)
-        input_pet = browser.find_element(By.NAME, "pet")
-        input_pet.send_keys("Мой вид")
-        input_name = browser.find_element(By.NAME, "name")
-        input_name.send_keys("Мое имя")
-        input_age = browser.find_element(By.NAME, "age")
-        input_age.send_keys("2")
-        input_sex = browser.find_element(By.NAME, "sex")
-        input_sex.send_keys("Мужской")
-        browser.find_element(By.CLASS_NAME, "button").click()
+        wait_until_clickable(browser, (By.NAME, "pet")).send_keys("Мой вид")
+        wait_until_clickable(browser, (By.NAME, "name")).send_keys("Мое имя")
+        wait_until_clickable(browser, (By.NAME, "age")).send_keys("2")
+        wait_until_clickable(browser, (By.NAME, "sex")).send_keys("Мужской")
+        wait_until_clickable(browser, (By.CLASS_NAME, "button")).click()
         by, value = By.CLASS_NAME, "is-success"
-        assert check_element_present(browser, by, value), "Не появилось сообщение об успехе"
+        assert element_is_present(browser, (by, value)), "Не появилось сообщение об успехе"
         assert browser.find_element(by, value).text == "Успех.", "Сообщение неверное"
 
 
@@ -43,14 +43,59 @@ def test_my_pet_negative():
         browser.get(url)
         browser.maximize_window()
         login(browser)
-        input_pet = browser.find_element(By.NAME, "pet")
-        input_pet.send_keys("Мой вид")
-        browser.find_element(By.CLASS_NAME, "button").click()
+        wait_until_clickable(browser, (By.NAME, "pet")).send_keys("Мой вид")
+        wait_until_clickable(browser, (By.CLASS_NAME, "button")).click()
         by, value = By.CLASS_NAME, "is-danger"
-        assert check_element_present(browser, by, value), "Не появилось сообщение об ошибке"
+        assert element_is_present(browser, (by, value)), "Не появилось сообщение об ошибке"
         assert browser.find_element(by, value).text == "Заполнены не все поля.", "Сообщение неверное"
         by, value = By.CLASS_NAME, "is-success"
-        assert not check_element_present(browser, by, value), "Появилось сообщение об успехе"
+        assert not element_is_present(browser, (by, value)), "Появилось сообщение об успехе"
+
+
+def test_about_me():
+    with Chrome() as browser:
+        url = 'https://qastand.valhalla.pw/about'
+        browser.get(url)
+        browser.maximize_window()
+        login(browser)
+        wait_until_clickable(browser, (By.NAME, "name")).send_keys("Андрей")
+        wait_until_clickable(browser, (By.NAME, "surname")).send_keys("Павлов")
+        specialist = wait_until_clickable(browser, (By.ID, "age1")).get_attribute("checked")
+        assert specialist, "По умолчанию выбрано значние Не ручной тестировщик"
+
+        wait_until_clickable(browser, (By.ID, "age2")).click()
+        wait_until_clickable(browser, (By.ID, "lang1")).click()
+        wait_until_clickable(browser, (By.ID, "lang3")).click()
+        element = wait_until_clickable(browser, (By.ID, "lvl"))
+        select = Select(element)
+        select.select_by_visible_text("Senior")
+
+        wait_until_clickable(browser, (By.NAME, "surname")).send_keys(Keys.ENTER)
+        by, value = By.CLASS_NAME, "is-success"
+        assert wait_until_visible(browser, (by, value)).text == "Успех.", \
+            "Сообщение об отправке формы не успешно"
+
+
+def test_upload_file():
+    with Chrome() as browser:
+        url = 'https://qastand.valhalla.pw/upload_file'
+        browser.get(url)
+        browser.maximize_window()
+        login(browser)
+
+        element_for_upload = browser.find_element(By.NAME, "file")
+        element_for_upload.send_keys(os.path.join(os.getcwd(), 'resources', 'cat.png'))
+
+        # wait_until_clickable(browser, (By.CLASS_NAME, "file-input")).\
+        #    send_keys(os.path.join(os.getcwd(), 'resources', 'cat.png'))
+        wait_until_clickable(browser, (By.CLASS_NAME, "button")).click()
+
+        by, value = By.CLASS_NAME, "is-success"
+        assert wait_until_visible(browser, (by, value)).text == "Успех", \
+            "Сообщение о загрузке файла не успешно"
+        browser.refresh()
+        time.sleep(1)
+        assert not element_is_present(browser, (by, value)), "Появилось сообщение об успехе"
 
 
 def test_names_left_menu():
@@ -59,8 +104,8 @@ def test_names_left_menu():
         browser.get(url)
         browser.maximize_window()
         login(browser)
-        by, value = By.CSS_SELECTOR, "ul li"
-        items = browser.find_elements(by, value)
+        by, value = By.CSS_SELECTOR, ".menu-list .navbar-item"
+        items = wait_until_visible(browser, (by, value))
         names = ["Поля ввода и кнопки", "Мой питомец", "О себе", "Загрузка файла",
                  "Ожидание", "Медленная загрузка", "Модальные окна", "Новая вкладка",
                  "iframe", "Drag-and-drop"]
