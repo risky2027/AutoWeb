@@ -1,13 +1,15 @@
 import os.path
 import time
 
-from selenium.webdriver import Chrome, Keys
+from selenium.webdriver import Chrome, Keys, ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as ec
 
 from functions import login, element_is_present, wait_until_clickable, \
-    wait_until_visible, check_alert_is_present, wait_until_present, check_until_url, check_until_title, \
-    wait_until_text
+    wait_until_visible, check_alert_is_present, check_until_url, check_until_title, \
+    wait_until_text, wait_until_visible_iframe
 
 
 def test_inputs_page():
@@ -152,3 +154,62 @@ def test_profile():
             "URL неверный"
         browser.refresh()
         assert check_until_title(browser, "Course Test Stand"), "Заголовок страницы неверный"
+
+
+def test_new_window():
+    with Chrome() as browser:
+        url = 'https://qastand.valhalla.pw/new_window_button'
+        browser.get(url)
+        browser.maximize_window()
+        login(browser)
+        windows = browser.window_handles
+        assert len(windows) == 1, "Открыта не 1 вкладка"
+        wait_until_clickable(browser, (By.CLASS_NAME, 'button')).click()
+        windows = browser.window_handles
+        browser.switch_to.window(windows[1])
+        assert len(windows) == 2, "Открыто не 2 вкладки"
+        wait_until_clickable(browser, (By.CLASS_NAME, 'button')).click()
+        alert = WebDriverWait(browser, 5).until(ec.alert_is_present())
+        alert.accept()
+        time.sleep(1)
+        windows = browser.window_handles
+        assert len(windows) == 1, "Открыта не 1 вкладка"
+
+
+def test_modal_windows():
+    with Chrome() as browser:
+        url = 'https://qastand.valhalla.pw/three_buttons'
+        browser.get(url)
+        browser.maximize_window()
+        login(browser)
+        wait_until_clickable(browser, (By.CSS_SELECTOR, '[onclick = "confirm_func()"]')).click()
+        confirm = WebDriverWait(browser, 5).until(ec.alert_is_present())
+        confirm.dismiss()
+        assert wait_until_visible(browser, (By.ID, 'confirm_text')), "Сообщение о запуске появилось"
+
+
+def test_iframe():
+    with Chrome() as browser:
+        url = 'https://qastand.valhalla.pw/iframe_page'
+        browser.get(url)
+        browser.maximize_window()
+        login(browser)
+        wait_until_visible_iframe(browser, (By.ID, 'my_iframe'))
+        assert element_is_present(browser, (By.ID, 'photo')), "Картинка в фрейме не найдена"
+        wait_until_clickable(browser, (By.CSS_SELECTOR, '[onclick = "alert_func()"]')).click()
+        alert = WebDriverWait(browser, 5).until(ec.alert_is_present())
+        alert.accept()
+        browser.switch_to.default_content()
+
+
+def test_drag_and_drop():
+    with Chrome() as browser:
+        url = 'https://qastand.valhalla.pw/drag_and_drop_page'
+        browser.get(url)
+        browser.maximize_window()
+        login(browser)
+        action_chaines = ActionChains(browser)
+        element_source = wait_until_clickable(browser, (By.ID, 'draggable'))
+        element_target = wait_until_clickable(browser, (By.ID, 'droppable'))
+        action_chaines.drag_and_drop(element_source, element_target).perform()
+        assert element_is_present(browser, (By.CSS_SELECTOR, '#droppable p')), "В квадрате нет коалы"

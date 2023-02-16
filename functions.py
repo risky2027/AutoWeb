@@ -58,3 +58,7 @@ def check_until_title(driver: Chrome, title, timeout: int = 5) -> bool:
         return True
     except TimeoutException:
         return False
+
+
+def wait_until_visible_iframe(driver: Chrome, locator: Tuple, timeout: int = 10) -> WebElement:
+    return WebDriverWait(driver, timeout).until(ec.frame_to_be_available_and_switch_to_it(locator))
