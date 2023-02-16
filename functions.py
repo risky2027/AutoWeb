@@ -23,7 +23,7 @@ def wait_until_present(driver: Chrome, locator: Tuple, timeout: int = 5) -> WebE
     return WebDriverWait(driver, timeout).until(ec.presence_of_element_located(locator))
 
 
-def wait_until_visible(driver: Chrome, locator: Tuple, timeout: int = 25) -> WebElement:
+def wait_until_visible(driver: Chrome, locator: Tuple, timeout: int = 5) -> WebElement:
     return WebDriverWait(driver, timeout).until(ec.visibility_of_element_located(locator))
 
 
@@ -35,6 +35,26 @@ def element_is_present(browser: Chrome, locator: Tuple, timeout: int = 5) -> boo
         return False
 
 
-def check_alert_is_present(driver: Chrome, timeout=5) -> None:
+def check_alert_is_present(driver: Chrome, timeout=5):
     alert = WebDriverWait(driver, timeout).until(ec.alert_is_present())
-    assert "Успех!" in alert.text
+    assert "Успех!" in alert.text, "Уведомление неверное, нажатие кнопки не своевременно"
+
+
+def wait_until_text(driver: Chrome, locator: Tuple, text, timeout: int = 10) -> WebElement:
+    return WebDriverWait(driver, timeout).until(ec.text_to_be_present_in_element(locator, text))
+
+
+def check_until_url(driver: Chrome, url, timeout: int = 5) -> bool:
+    try:
+        WebDriverWait(driver, timeout).until(ec.url_to_be(url))
+        return True
+    except TimeoutException:
+        return False
+
+
+def check_until_title(driver: Chrome, title, timeout: int = 5) -> bool:
+    try:
+        WebDriverWait(driver, timeout).until(ec.title_is(title))
+        return True
+    except TimeoutException:
+        return False

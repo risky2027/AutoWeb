@@ -5,7 +5,9 @@ from selenium.webdriver import Chrome, Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 
-from functions import login, element_is_present, wait_until_clickable, wait_until_visible
+from functions import login, element_is_present, wait_until_clickable, \
+    wait_until_visible, check_alert_is_present, wait_until_present, check_until_url, check_until_title, \
+    wait_until_text
 
 
 def test_inputs_page():
@@ -111,3 +113,42 @@ def test_names_left_menu():
                  "iframe", "Drag-and-drop"]
         for i, item in enumerate(names):
             assert item == names[i], "Название не соответствует полю"
+
+
+def test_page_with_timer():
+    with Chrome() as browser:
+        url = 'https://qastand.valhalla.pw/wait'
+        browser.get(url)
+        browser.maximize_window()
+        login(browser)
+        wait_until_text(browser, (By.ID, "demo"), "100")
+        wait_until_clickable(browser, (By.CSS_SELECTOR, '[onclick="check_value()"]')).click()
+        check_alert_is_present(browser)
+
+
+def test_low_load():
+    with Chrome() as browser:
+        url = 'https://qastand.valhalla.pw/slow_load'
+        browser.get(url)
+        browser.maximize_window()
+        login(browser)
+        wait_until_clickable(browser, (By.ID, 'text_input')).send_keys("Текст для поля")
+        wait_until_clickable(browser, (By.ID, 'button')).click()
+        assert wait_until_visible(browser, (By.CLASS_NAME, 'is-success')).text == "Успех.",\
+            "Сообщение неверное"
+        browser.refresh()
+        assert not element_is_present(browser, (By.CLASS_NAME, 'is-success')), \
+            "Сообщение об успехе осталось"
+
+
+def test_profile():
+    with Chrome() as browser:
+        url = 'https://qastand.valhalla.pw/profile'
+        browser.get(url)
+        browser.maximize_window()
+        login(browser)
+        wait_until_clickable(browser, (By.CSS_SELECTOR, '[href="/my_pet"]')).click()
+        assert check_until_url(browser, "https://qastand.valhalla.pw/my_pet"), \
+            "URL неверный"
+        browser.refresh()
+        assert check_until_title(browser, "Course Test Stand"), "Заголовок страницы неверный"
