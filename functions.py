@@ -12,6 +12,14 @@ from selenium.webdriver.support.wait import WebDriverWait
 def login(browser):
     wait_until_clickable(browser, (By.NAME, "email")).send_keys("qa_test@test.ru")
     wait_until_clickable(browser, (By.NAME, "password")).send_keys("!QAZ2wsx")
+    wait_until_clickable(browser, (By.CSS_SELECTOR, "[type = 'checkbox']")).click()
+    wait_until_clickable(browser, (By.CLASS_NAME, "button")).click()
+
+
+def login_with_params(browser, email, password):
+    wait_until_clickable(browser, (By.NAME, "email")).send_keys(email)
+    wait_until_clickable(browser, (By.NAME, "password")).send_keys(password)
+    wait_until_clickable(browser, (By.CSS_SELECTOR, "[type = 'checkbox']")).click()
     wait_until_clickable(browser, (By.CLASS_NAME, "button")).click()
 
 
@@ -50,6 +58,10 @@ def check_until_url(driver: Chrome, url, timeout: int = 5) -> bool:
         return True
     except TimeoutException:
         return False
+
+
+def wait_until_url(driver: Chrome, url, timeout: int = 5) -> WebElement:
+    return WebDriverWait(driver, timeout).until(ec.url_to_be(url))
 
 
 def check_until_title(driver: Chrome, title, timeout: int = 5) -> bool:
