@@ -1,7 +1,6 @@
 from typing import Tuple
 
 from selenium.common.exceptions import TimeoutException
-from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver import Chrome
 from selenium.webdriver.remote.webdriver import WebElement
@@ -16,7 +15,7 @@ def login(browser):
     wait_until_clickable(browser, (By.CLASS_NAME, "button")).click()
 
 
-def login_with_params(browser, email, password):
+def login_with_params(browser, email, password) -> None:
     wait_until_clickable(browser, (By.NAME, "email")).send_keys(email)
     wait_until_clickable(browser, (By.NAME, "password")).send_keys(password)
     wait_until_clickable(browser, (By.CSS_SELECTOR, "[type = 'checkbox']")).click()

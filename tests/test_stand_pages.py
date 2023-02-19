@@ -88,7 +88,7 @@ def test_upload_file():
         login(browser)
 
         element_for_upload = browser.find_element(By.NAME, "file")
-        element_for_upload.send_keys(os.path.join(os.getcwd(), 'resources', 'cat.png'))
+        element_for_upload.send_keys(os.path.join(os.getcwd(), '../resources', 'cat.png'))
 
         # wait_until_clickable(browser, (By.CLASS_NAME, "file-input")).\
         #    send_keys(os.path.join(os.getcwd(), 'resources', 'cat.png'))
