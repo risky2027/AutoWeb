@@ -13,7 +13,7 @@ def delete_user_posts(url):
 
 
 @pytest.mark.blog
-class TestsBlog:
+class TestsBlogOpen:
     def test_open_post(self, browser, url):
         browser.get(url + Links.blog)
         wait_until_clickable(browser, (By.CSS_SELECTOR, "[href='/blog/page/1/test-post/']")).click()

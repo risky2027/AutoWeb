@@ -2,14 +2,13 @@ from json import JSONDecodeError
 from typing import Dict, Union
 from http import HTTPStatus
 
-import requests as requests
+import requests
 
 from tests.constants import POSITIVE_LOGIN_CREDENTIALS
 
 
 def check_response(func):
     """Декоратор, который проверяет статус ответа и конвертирует ответ в json"""
-
     def wrapper(self, url, **kwargs):
         response = func(self, url, **kwargs)
         if response.status_code != HTTPStatus.OK:
@@ -33,8 +32,9 @@ class Client:
     def auth(self) -> Dict:
         """Метод для авторизации пользователя. В рамках него создается сессия, в которой авторизуется
         пользователь. Метод возвращает авторизационные куки"""
-        self._session = requests.session()
-        self._session.post(self._login, data=POSITIVE_LOGIN_CREDENTIALS)
+        if not self._session:
+            self._session = requests.session()
+            self._session.post(self._login, data=POSITIVE_LOGIN_CREDENTIALS)
         return self._session.cookies.get_dict()
 
     @check_response
@@ -43,7 +43,7 @@ class Client:
         return self._session.post(self._base_url + url, data=body)
 
     @check_response
-    def get(self, url: str):
+    def get(self, url: str) -> Union[Dict, None]:
         """Метод для отправки GET запросов"""
         return self._session.get(self._base_url + url)
 

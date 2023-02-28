@@ -14,17 +14,20 @@ def browser():
     browser.quit()
 
 
-def pytest_addoption(parser):
-    parser.addoption("--env", default="prod")
-
-
 @pytest.fixture(scope="session")
 def url(request):
+    """Фикстура для получения заданного из командной строки окружения"""
     env = request.config.getoption("--env")
     url = Links.base_url.get(env)
     if not url:
         raise Exception("Передано неверное окружение")
     return url
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--env", default="prod"
+    )
 
 
 @pytest.fixture(scope="session", autouse=True)
