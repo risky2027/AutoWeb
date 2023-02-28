@@ -1,4 +1,4 @@
-from typing import Union, Dict
+from typing import Union, Dict, List
 
 from api.api_client import Client
 
@@ -6,10 +6,6 @@ from api.api_client import Client
 class BlogApi(Client):
     """"Класс с методами для отправки api-запросов к блогу"""
     _posts = "api/posts"
-
-    #def __init__(self, url):
-    #    super().__init__(url)
-    #    self._posts = "api/posts"
 
     def get_user_posts(self) -> Union[Dict, None]:
         """Метод для получения всех постов пользователя"""
@@ -20,4 +16,6 @@ class BlogApi(Client):
         """Метод для получения всех постов пользователя"""
         return self.delete(f"{self._posts}/{post_id}")
 
-    #post create
+    def create_post(self, title: str, text: str, tags: List[str]) -> Union[Dict, None]:
+        """Метод для создания поста"""
+        return self.post(self._posts, body={"title": title, "text": text, "tags": tags})
