@@ -1,8 +1,9 @@
 class Links:
-    base_url = "https://qastand.valhalla.pw/"
-    login = base_url + "login"
-    profile = base_url + "profile"
-    blog = base_url + "blog"
+    base_url = {"prod": "https://qastand.valhalla.pw/",
+                "stage": "https://qastand-dev.valhalla.pw/"}
+    login = "login"
+    profile = "profile"
+    blog = "blog"
 
 
 POSITIVE_LOGIN_CREDENTIALS = {"email": "qa_test@test.ru",
@@ -14,7 +15,3 @@ NEGATIVE_LOGIN_CREDENTIALS = [
     ("qa_test@list.ru", "12345")
 ]
 
-SESSION_COOKIE = {'name': 'session',
-                  'value':
-                  'eyJfZnJlc2giOmZhbHNlfQ.Y_IDrA.Be3ENJPpInFgJGKgqllFvvY8eLs'
-                  }

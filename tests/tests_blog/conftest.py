@@ -1,9 +1,10 @@
 import pytest
 
-from tests.constants import Links, SESSION_COOKIE
+from api.blog_api import BlogApi
 
 
 @pytest.fixture(autouse=True)
-def login(browser):
-    browser.get(Links.login)
-    browser.add_cookie(SESSION_COOKIE)
+def login(browser, url):
+    browser.get(url)
+    cookie = BlogApi(url).auth()
+    browser.add_cookie({"name": "session", "value": cookie["session"]})
