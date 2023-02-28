@@ -1,14 +1,14 @@
 import random
 
 import pytest
-from selenium.webdriver import Chrome
 
-from tests.constants import Links
+from constants import Links, VALID_BROWSERS
 
 
 @pytest.fixture()
-def browser():
-    browser = Chrome()
+def browser(request):
+    launch = request.config.getoption("--launch")
+    browser = VALID_BROWSERS[launch]()
     browser.maximize_window()
     yield browser
     browser.quit()
@@ -24,12 +24,24 @@ def url(request):
     return url
 
 
+def pytest_configure(config):
+    config.addinivalue_line(
+        "markers", "auth: tests for auth testing"
+    )
+    config.addinivalue_line(
+        "markers", "smoke: tests for smoke testing"
+    )
+
+
 def pytest_addoption(parser):
     parser.addoption(
         "--env", default="prod"
     )
+    parser.addoption(
+        "--launch", default="chrome", choices=["chrome", "opera"]
+    )
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope='session', autouse=True)
 def faker_seed():
     return random.randint(0, 9999)

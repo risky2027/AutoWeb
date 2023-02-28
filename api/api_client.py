@@ -4,11 +4,12 @@ from http import HTTPStatus
 
 import requests
 
-from tests.constants import POSITIVE_LOGIN_CREDENTIALS
+from constants import POSITIVE_LOGIN_CREDENTIALS
 
 
 def check_response(func):
     """Декоратор, который проверяет статус ответа и конвертирует ответ в json"""
+
     def wrapper(self, url, **kwargs):
         response = func(self, url, **kwargs)
         if response.status_code != HTTPStatus.OK:
@@ -17,11 +18,12 @@ def check_response(func):
             return response.json()
         except JSONDecodeError:
             return None
-        return wrapper
+
+    return wrapper
 
 
 class Client:
-    """Класс api-клиент для отправки разных типов запросов"""
+    """Класс - апи-клиент для отправки разных типов запросов"""
 
     def __init__(self, url):
         self._session = None
@@ -30,8 +32,8 @@ class Client:
         self.auth()
 
     def auth(self) -> Dict:
-        """Метод для авторизации пользователя. В рамках него создается сессия, в которой авторизуется
-        пользователь. Метод возвращает авторизационные куки"""
+        """Метод для авторизации пользователя, создает сессию, в которой авторизуется,
+        возвращает авторизационные куки"""
         if not self._session:
             self._session = requests.session()
             self._session.post(self._login, data=POSITIVE_LOGIN_CREDENTIALS)
