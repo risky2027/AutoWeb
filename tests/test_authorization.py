@@ -10,7 +10,7 @@ class TestAuthorization:
 
     @pytest.fixture(autouse=True)
     def setup(self, browser, url):
-        self. auth_page = AuthPage(browser, url + Links.login)
+        self.auth_page = AuthPage(browser, url + Links.login)
         self.auth_page.open_page()
         self.blog_page = MainPage(browser, url + Links.blog)
 
@@ -28,6 +28,7 @@ class TestAuthorization:
         self.auth_page.login_ui(email, password)
         self.auth_page.check_page_is_open(url + Links.login)
 
+    @pytest.mark.notparallel
     @pytest.mark.usefixtures("login")
     def test_logout(self):
         self.blog_page.open_page()

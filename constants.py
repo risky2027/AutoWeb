@@ -1,4 +1,4 @@
-from selenium.webdriver import Chrome
+from selenium.webdriver import Chrome, Remote
 
 NEGATIVE_LOGIN_CREDENTIALS = [
     ("", "!QAZ2wsx"),
@@ -20,6 +20,11 @@ class Links:
 
 
 VALID_BROWSERS = {
-   "chrome": Chrome
-   #"opera": Opera
+    "chrome": Chrome,
+    "remote": Remote
+    #"opera": Opera
 }
+
+BROWSER_REMOTE_CAPABILITIES = {"browserName": "chrome", "version": "110.0"}
+
+SELENOID_URL = "http://localhost:4444/wd/hub"
