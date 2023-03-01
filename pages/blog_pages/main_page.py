@@ -44,3 +44,6 @@ class MainPage(BasePage):
 
     def check_post_not_exists(self, title):
         assert not self.element_is_present((By.XPATH, self.POST_TITLE.format(title))), "Пост не удален"
+
+    def check_unauthorized_user_cannot_create_post(self):
+        assert not self.element_is_present(self.CREATE_POST_BUTTON, timeout=1)

@@ -2,6 +2,7 @@ from typing import Tuple
 
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver import Chrome
+from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebElement
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
@@ -9,12 +10,20 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 # класс с общими хэлперами и методами для работы с элементами, которые расположены на каждой странице
 class BasePage:
+    LOGOUT_BUTTON = (By.CSS_SELECTOR, "[href='/logout']")
+
     def __init__(self, browser: Chrome, url):
         self.browser = browser
         self.url = url
 
     def open_page(self):
         self.browser.get(self.url)
+
+    def check_page_is_open(self, url):
+        assert self.wait_for_url_to_be(url)
+
+    def logout(self):
+        self.wait_until_clickable(self.LOGOUT_BUTTON).click()
 
     def wait_for_url_to_be(self, url: str, timeout: int = 5) -> bool:
         """Ждём, пока URL страницы не начнёт соответствовать ожидаемому"""

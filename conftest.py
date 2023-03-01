@@ -2,13 +2,18 @@ import random
 
 import pytest
 
+from api.api_client import Client
 from constants import Links, VALID_BROWSERS
+from selenium.webdriver import Remote
 
 
 @pytest.fixture()
 def browser(request):
     launch = request.config.getoption("--launch")
     browser = VALID_BROWSERS[launch]()
+    #browser = Remote(command_executor="http://localhost:4444/wd/hub", desired_capabilities={
+    #                    "browserName": "chrome", "version": "110.0"
+    #                })
     browser.maximize_window()
     yield browser
     browser.quit()
@@ -22,6 +27,13 @@ def url(request):
     if not url:
         raise Exception("Передано неверное окружение")
     return url
+
+
+@pytest.fixture()
+def login(browser, url):
+    cookie = Client(url).auth()
+    browser.get(url)
+    browser.add_cookie({"name": "session", "value": cookie["session"]})
 
 
 def pytest_configure(config):

@@ -23,7 +23,7 @@ def create_post_for_test(url, faker):
     return title, text
 
 
-@pytest.mark.usefixtures("delete_user_posts")
+@pytest.mark.usefixtures("delete_user_posts", "login")
 class TestsBlogOpen:
     @pytest.fixture(autouse=True)
     def setup(self, browser, url):
@@ -38,7 +38,7 @@ class TestsBlogOpen:
         self.post_page.check_post_text(text)
 
 
-@pytest.mark.usefixtures("delete_user_posts")
+@pytest.mark.usefixtures("delete_user_posts", "login")
 class TestsBlogModify:
     @pytest.fixture(autouse=True)
     def setup(self, browser, url):

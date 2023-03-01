@@ -18,3 +18,6 @@ class PostModifyPage(BasePage):
 
     def add_tags(self, tags):
         self.wait_until_clickable(self.TAGS_FIELD).send_keys(tags)
+
+    def click_submit_button(self):
+        self.wait_until_clickable(self.SUBMIT_BUTTON).click()
